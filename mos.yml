@@ -1,0 +1,35 @@
+author: d4rkmen <darkmen@i.ua>
+description: Twinkly smart decoration library 
+type: lib
+version: 1.0
+
+tags:
+  - c
+  - hw
+
+sources:
+  - src
+
+includes:
+  - include
+
+config_schema:
+  - ["twinkly", "o", {title: "Twinkly settings"}]
+  - ["twinkly.enable", "b", true, {title: "Enable twinkly"}]
+  - ["twinkly.rpc_enable", "b", true, {title: "Enable twinkly rpc handlers"}]
+  - ["twinkly.config_changed", "b", true, {title: "Device was added or removed"}]
+  # - ["mqtt.server", "mqtt.twinkly.com"]
+  # - ["mqtt.user", "twinkly_noauth"]
+  # - ["mqtt.pass", "jB4AWm8JbvaNf343LuJHNvmE"]
+  - ["mqtt.server", "broker.hivemq.com"]
+  - ["mqtt.clean_session", true]
+  - ["mqtt.enable", true]
+ 
+libs:
+  - origin: https://github.com/mongoose-os-libs/lwip
+  - origin: https://github.com/mongoose-os-libs/jstore
+  - origin: https://github.com/mongoose-os-libs/rpc-common
+  - origin: https://github.com/mongoose-os-libs/mqtt
+
+# Used by the mos tool to catch mos binaries incompatible with this file format
+manifest_version: 2020-08-02
