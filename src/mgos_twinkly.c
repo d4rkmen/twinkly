@@ -264,7 +264,7 @@ static void twinkly_logout_cb(void* data, void* arg) {
         LOG(LL_ERROR, ("%s error", __func__));
         goto exit;
     }
-    LOG(LL_INFO, ("resp %ld: %.*s", (long) hm->resp_code, hm->body.len, hm->body.p));
+    LOG(LL_DEBUG, ("resp %ld: %.*s", (long) hm->resp_code, hm->body.len, hm->body.p));
     if (hm->resp_code != 200) {
         LOG(LL_ERROR, ("logout error %ld", (long) hm->resp_code));
         hm = NULL;
@@ -301,7 +301,7 @@ static void twinkly_login_cb(void* data, void* arg) {
         LOG(LL_ERROR, ("%s error", __func__));
         goto exit;
     }
-    LOG(LL_INFO, ("resp %ld: %.*s", (long) hm->resp_code, hm->body.len, hm->body.p));
+    LOG(LL_DEBUG, ("resp %ld: %.*s", (long) hm->resp_code, hm->body.len, hm->body.p));
     if (hm->resp_code != 200) {
         LOG(LL_ERROR, ("login error %ld", (long) hm->resp_code));
         hm = NULL;
