@@ -691,7 +691,6 @@ static void twinkly_info_cb(void* data, void* arg) {
     // int res;
     struct mg_str* ip = cc->userdata;
 
-    LOG(LL_INFO, (__func__));
     if (cc && cc->cb)
         cc->cb(data, cc->arg); // info_rpc_cb
     mg_strfree(ip);
