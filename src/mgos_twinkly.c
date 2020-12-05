@@ -77,7 +77,7 @@ static void twinkly_device_free(struct async_ctx* device) {
     free(device);
 }
 
-static int jstore_add_device(struct mg_str* ip, struct mg_str json) {
+static int jstore_add_device(struct mg_str* ip, struct mg_str json, int *index) {
     LOG(LL_DEBUG, ("%s %.*s %.*s", __func__, ip->len, ip->p, json.len, json.p));
     char* mac = NULL;
     if (json_scanf(json.p, json.len, "{mac: %Q}", &mac) == 0) {
@@ -97,7 +97,7 @@ static int jstore_add_device(struct mg_str* ip, struct mg_str json) {
         goto clean;
     }
     char* err;
-    mgos_jstore_item_add(store, *ip, json, MGOS_JSTORE_OWN_FOREIGN, MGOS_JSTORE_OWN_FOREIGN, NULL, NULL, &err);
+    mgos_jstore_item_add(store, *ip, json, MGOS_JSTORE_OWN_FOREIGN, MGOS_JSTORE_OWN_FOREIGN, NULL, index, &err);
     if (err) {
         res = MGOS_TWINKLY_ERROR_JSTORE;
         goto clean;
@@ -643,8 +643,9 @@ static void twinkly_add_cb(void* data, void* arg) {
     struct cb_ctx* cc = arg;
     int res;
     struct mg_str* ip = cc->userdata;
+    int idx;
 
-    res = hm ? jstore_add_device(ip, hm->body) : MGOS_TWINKLY_ERROR_TIMEOUT;
+    res = hm ? jstore_add_device(ip, hm->body, &idx) : MGOS_TWINKLY_ERROR_TIMEOUT;
     if (hm) {
         mgos_sys_config_set_twinkly_config_changed(true);
         mgos_sys_config_save(&mgos_sys_config, false, NULL);
@@ -652,7 +653,7 @@ static void twinkly_add_cb(void* data, void* arg) {
         // For gen1 device only (current gen2 fw = 2.5.6)
         if (is_gen1(get_family(hm->body))){
             twinkly_set_mqtt_config(ip, mgos_sys_config_get_mqtt_server());
-            twinkly_subscribe_cb(0, ip, &hm->body);
+            twinkly_subscribe_cb(idx, ip, &hm->body);
         }
     }
     if (cc && cc->cb)
