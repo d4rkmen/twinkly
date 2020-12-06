@@ -252,6 +252,7 @@ exit:
         device->cb(hm, device); // method_cb
 }
 
+#if 0
 static void twinkly_logout_cb(void* data, void* arg) {
     LOG(LL_DEBUG, ("%s %p %p", __func__, data, arg));
     if (!arg) {
@@ -288,6 +289,7 @@ exit:
     if (device->cb)
         device->cb(hm, device); // method_cb
 }
+#endif
 
 static void twinkly_login_cb(void* data, void* arg) {
     LOG(LL_DEBUG, ("%s %p %p", __func__, data, arg));
