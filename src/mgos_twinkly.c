@@ -409,6 +409,7 @@ static void twinkly_login_request(struct async_ctx* device) {
             "{\"challenge\": \"sT/f+2z8HvEkP3topBoJL83eWNZZtpAb1v+tcfY4E3s=\"}");
 }
 
+#if 0
 static void twinkly_logout_request(struct async_ctx* device) {
     LOG(LL_DEBUG, (__func__));
     struct cb_ctx* cadd = calloc(1, sizeof(struct cb_ctx));
@@ -428,6 +429,7 @@ static void twinkly_logout_request(struct async_ctx* device) {
     http_request(&device->ip, METHOD_LOGOUT, cadd, headers, "{}");
     free(headers);
 }
+#endif
 
 static void twinkly_verify_request(struct async_ctx* device, char* data) {
     LOG(LL_DEBUG, (__func__));
