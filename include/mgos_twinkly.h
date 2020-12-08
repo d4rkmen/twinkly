@@ -45,71 +45,28 @@ enum mgos_twinkly_event {
     MGOS_TWINKLY_EV_REMOVED
 };
 
-enum mgos_twinkly_device_family {
-    MGOS_TWINKLY_DEVICE_FAMILY_TWINKLY,
-    MGOS_TWINKLY_DEVICE_FAMILY_PRO,
-    MGOS_TWINKLY_DEVICE_FAMILY_PROWIFI,
-    MGOS_TWINKLY_DEVICE_FAMILY_PRO2
-};
-
-enum mgos_twinkly_led_profile {
-    MGOS_TWINKLY_LED_PROFILE_RGB,
-    MGOS_TWINKLY_LED_PROFILE_RGBW,
-    MGOS_TWINKLY_LED_PROFILE_AWW
-};
-
-enum mgos_twinkly_pixel_shape {
-    MGOS_TWINKLY_PIXEL_SHAPE_DOT,
-    MGOS_TWINKLY_PIXEL_SHAPE_DOR,
-    MGOS_TWINKLY_PIXEL_SHAPE_C7,
-    MGOS_TWINKLY_PIXEL_SHAPE_C9,
-    MGOS_TWINKLY_PIXEL_SHAPE_C12,
-    MGOS_TWINKLY_PIXEL_SHAPE_G35,
-};
-
-enum mgos_twinkly_name {
-    MGOS_TWINKLY_NAME_STRINGS,
-    MGOS_TWINKLY_NAME_CUSTOM,
-    MGOS_TWINKLY_NAME_CUSTOMSTAR,
-    MGOS_TWINKLY_NAME_CUSTOMHH,
-    MGOS_TWINKLY_NAME_CUSTOMMC,
-    MGOS_TWINKLY_NAME_TREE,
-    MGOS_TWINKLY_NAME_CANDY_CANE,
-    MGOS_TWINKLY_NAME_CONE,
-    MGOS_TWINKLY_NAME_ICICLE,
-    MGOS_TWINKLY_NAME_LOLLIPOP,
-    MGOS_TWINKLY_NAME_BALL,
-    MGOS_TWINKLY_NAME_LED_STRIP,
-    MGOS_TWINKLY_NAME_NET,
-    MGOS_TWINKLY_NAME_ONE_STRING,
-    MGOS_TWINKLY_NAME_GARLAND,
-    MGOS_TWINKLY_NAME_SNOWFLAKE,
-    MGOS_TWINKLY_NAME_DEER,
-    MGOS_TWINKLY_NAME_CURTAIN,
-    MGOS_TWINKLY_NAME_WALL,
-    MGOS_TWINKLY_NAME_WREATH,
-    MGOS_TWINKLY_NAME_SNOWMAN,
-    MGOS_TWINKLY_NAME_TOPPER,
-    MGOS_TWINKLY_NAME_SPLITZER,
-    MGOS_TWINKLY_NAME_CLUSTER,
-    MGOS_TWINKLY_NAME_FESTOON,
-    MGOS_TWINKLY_NAME_TWINKLY_MUSIZ
-};
-
 // Twinkly event data item
 typedef struct mgos_twinkly_ev_data {
-    int index;  // Device index in jstore
-    int value;  // Value
+    int index; // Device index in jstore
+    int value; // Value
 } mgos_twinkly_ev_data_t;
 
 struct mgos_twinkly_product {
     const char* product_code;
     const char* commercial_name;
+    const char* firmware_family;
     const char* device_family;
-    const char* default_name;
     const char* led_profile;
-    const char* pixel_shape;
     uint16_t led_number;
+    const char* default_name;
+    const char* layout_type;
+    const char* pixel_shape;
+    bool mapping_allowed;
+    const char* join_fml;
+    const char* sync_fml;
+    bool bluetooth;
+    bool microphone;
+    const char* icon;
 };
 
 // The callback for twinkly async actions. res - result data for callback,
@@ -135,6 +92,8 @@ int mgos_twinkly_count();
 bool mgos_twinkly_set_mode(int idx, bool mode);
 // Set brightness
 bool mgos_twinkly_set_brightness(int idx, int value);
+// Get product info by given product code
+bool mgos_twinkly_get_product(char* code, struct mgos_twinkly_product** product);
 
 // library
 bool mgos_twinkly_init(void);

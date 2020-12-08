@@ -19,13 +19,12 @@
 #include <string.h>
 #include <unistd.h>
 
-// #include "common/queue.h"
-
 #include "mgos.h"
 #include "mgos_rpc.h"
 #include "mgos_jstore.h"
 #include "mgos_mqtt.h"
 #include "mgos_twinkly.h"
+#include "twinkly_products.h"
 
 #define JSON_PATH                 "twinkly.json"
 #define METHOD_GESTALT            "gestalt"
@@ -77,7 +76,7 @@ static void twinkly_device_free(struct async_ctx* device) {
     free(device);
 }
 
-static int jstore_add_device(struct mg_str* ip, struct mg_str json, int *index) {
+static int jstore_add_device(struct mg_str* ip, struct mg_str json, int* index) {
     LOG(LL_DEBUG, ("%s %.*s %.*s", __func__, ip->len, ip->p, json.len, json.p));
     char* mac = NULL;
     if (json_scanf(json.p, json.len, "{mac: %Q}", &mac) == 0) {
@@ -362,7 +361,7 @@ exit:
 
 static void
         twinkly_device_request(struct async_ctx* device, char* method, const char* post_data, tw_cb_t cb, void* arg) {
-    LOG(LL_DEBUG, ("%s %s",__func__, method));
+    LOG(LL_DEBUG, ("%s %s", __func__, method));
     // async context fill
     device->method = method;
     device->post_data = post_data;
@@ -655,7 +654,7 @@ static void twinkly_add_cb(void* data, void* arg) {
         mgos_sys_config_save(&mgos_sys_config, false, NULL);
         mgos_event_trigger(MGOS_TWINKLY_EV_ADDED, NULL);
         // For gen1 device only (current gen2 fw = 2.5.6)
-        if (is_gen1(get_family(hm->body))){
+        if (is_gen1(get_family(hm->body))) {
             twinkly_set_mqtt_config(ip, mgos_sys_config_get_mqtt_server());
             twinkly_subscribe_cb(idx, ip, &hm->body);
         }
@@ -665,6 +664,15 @@ static void twinkly_add_cb(void* data, void* arg) {
     mg_strfree(ip);
     free(ip);
     free(cc);
+}
+
+bool mgos_twinkly_get_product(char* code, struct mgos_twinkly_product** product) {
+    for (int i = 0; i < sizeof(twinkly_products) / sizeof(struct mgos_twinkly_product); i++)
+        if (strcmp((const char*) code, twinkly_products[i].product_code) == 0) {
+            *product = (struct mgos_twinkly_product*) &twinkly_products[i];
+            return true;
+        }
+    return false;
 }
 
 static void info_rpc_cb(void* data, void* arg) {
@@ -678,7 +686,40 @@ static void info_rpc_cb(void* data, void* arg) {
             LOG(LL_ERROR, ("Invalid response"));
             mg_rpc_send_responsef(ri, "{code: %d, message: %Q}", 1, "Invalid response");
         } else {
-            mg_rpc_send_responsef(ri, "%.*s", json.len, json.p);
+            struct mbuf fb;
+            struct json_out out = JSON_OUT_MBUF(&fb);
+            mbuf_init(&fb, 100);
+            char* product_code;
+            if (json_scanf(json.p, json.len, "{product_code: %Q}", &product_code) == 1) {
+                struct mgos_twinkly_product* p = NULL;
+                if (mgos_twinkly_get_product(product_code, &p)) {
+                    json_printf(
+                            &out,
+                            "{%.*s,product:{commercial_name:%Q,device_family:%Q,led_profile:%Q,led_number:%d,default_"
+                            "name:%"
+                            "Q,layout_type:%Q,pixel_shape:%Q,mapping_allowed:%B,join_fml:%Q,sync_fml:%Q,bluetooth:%B,"
+                            "microphone:%B,icon:%Q}}",
+                            json.len - 2,
+                            json.p + 1,
+                            p->commercial_name,
+                            p->device_family,
+                            p->led_profile,
+                            p->led_number,
+                            p->default_name,
+                            p->layout_type,
+                            p->pixel_shape,
+                            (int32_t) p->mapping_allowed,
+                            p->join_fml,
+                            p->sync_fml,
+                            (int32_t) p->bluetooth,
+                            (int32_t) p->microphone,
+                            p->icon);
+                } else {
+                    json_printf(&out, "{%.*s,product:null}", json.len - 2, json.p + 1);
+                }
+            }
+            mg_rpc_send_responsef(ri, "%.*s", fb.len, fb.buf);
+            mbuf_free(&fb);
         }
     } else {
         mg_rpc_send_responsef(ri, "{code: %d, message: %Q}", 2, "Connection timed out");
@@ -692,7 +733,6 @@ static void twinkly_info_cb(void* data, void* arg) {
     if (!arg)
         return;
     struct cb_ctx* cc = arg;
-    // int res;
     struct mg_str* ip = cc->userdata;
 
     if (cc && cc->cb)
@@ -1004,7 +1044,6 @@ static void set_mode_cb(void* data, void* arg) {
         hm = NULL;
     }
 }
-
 
 bool mgos_twinkly_set_mode(int idx, bool mode) {
     struct mgos_jstore* store = mgos_jstore_create(JSON_PATH, NULL);

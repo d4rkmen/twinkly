@@ -19,7 +19,7 @@ We can change MQTT broker host, port and user using the REST API. This way we do
 Unfortunatley, the newest devices (Gen2) use SSL connection to MQTT broker pors 8883, which makes impossible to use custom broker because or hardcoded CA inside the firmware. I wish the Twinkly developers consider to give user an option for CA cert and/or broker SSL enable/disable. 
 I know @[sirioz](https://github.com/sirioz) taking serious user's feedback and have plans [to open the API](https://github.com/jghaanstra/com.twinkly/issues/5#issue-540867018) for everyone. So may be one day things will change.
 
-### Comfig chema
+### Config chema
 
 ```javascript
 "twinkly": {
@@ -38,6 +38,49 @@ I know @[sirioz](https://github.com/sirioz) taking serious user's feedback and h
 * `Twinkly.Call` `{ip:%Q, method:%Q, data:%Q}` - call custom method
 
 Example:
+
+`$mos call --port ws://192.168.1.145/rpc twinkly.info '{"ip":"192.168.1.245"}' `
+
+```javascript
+{
+  "product_name": "Twinkly",
+  "hardware_version": "100",
+  "bytes_per_led": 3,
+  "hw_id": "xxxxxx",
+  "flash_size": 64,
+  "led_type": 19,
+  "product_code": "TWS600STP",
+  "fw_family": "M",
+  "device_name": "Глобоза",
+  "uptime": "90034823",
+  "mac": "98:сс:сс:сс:сс:сс",
+  "uuid": "СССССССС-СССС-СССС-СССС-СССССССССССС",
+  "max_supported_led": 1200,
+  "number_of_led": 600,
+  "led_profile": "RGB",
+  "frame_rate": 9,
+  "measured_frame_rate": 10.1,
+  "movie_capacity": 992,
+  "wire_type": 1,
+  "copyright": "LEDWORKS 2018",
+  "code": 1000,
+  "product": {
+    "commercial_name": "Twinkly Strings 600",
+    "device_family": null,
+    "led_profile": "RGB",
+    "led_number": 600,
+    "default_name": "Strings",
+    "layout_type": "2D",
+    "pixel_shape": "dot",
+    "mapping_allowed": true,
+    "join_fml": "Strings",
+    "sync_fml": "Strings",
+    "bluetooth": true,
+    "microphone": false,
+    "icon": "string"
+  }
+}
+```
 
 `$mos call --port ws://192.168.1.145/rpc twinkly.call '{"ip":"192.168.1.246","method":"summary"}' `
 
