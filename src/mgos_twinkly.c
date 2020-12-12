@@ -235,8 +235,8 @@ static void twinkly_verify_cb(void* data, void* arg) {
     if (json_scanf(json.p, json.len, "{code: %d}", &code) == 1) {
         if (code != 1000) {
             LOG(LL_ERROR, ("verify error, code %ld", (long) code));
-            hm = NULL;
-            goto exit;
+            // verify error, killing auth_token to re-login and retry
+            mg_strfree(&device->auth_token); 
         }
         twinkly_device_request(device, device->method, device->post_data, device->cb, device->arg);
     }
@@ -340,6 +340,8 @@ static void twinkly_device_cb(void* data, void* arg) {
     LOG(LL_DEBUG, ("%s %p %p", __func__, data, arg));
     struct http_message* hm = data;
     struct async_ctx* device = arg;
+    if(!device)
+        return;
     if (!data)
         goto exit;
     LOG(LL_DEBUG, ("resp %ld: %.*s", (long) hm->resp_code, hm->body.len, hm->body.p));
