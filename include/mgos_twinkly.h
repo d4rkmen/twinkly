@@ -94,6 +94,8 @@ bool mgos_twinkly_set_mode(int idx, bool mode);
 bool mgos_twinkly_set_brightness(int idx, int value);
 // Get product info by given product code
 bool mgos_twinkly_get_product(char* code, struct mgos_twinkly_product** product);
+// Clear all devices
+void mgos_twinkly_reset(void);
 
 // library
 bool mgos_twinkly_init(void);

@@ -175,6 +175,9 @@ static void ev_handler(struct mg_connection* c, int ev, void* p, void* user_data
             break;
         };
         case MG_EV_CLOSE: {
+            char addr[32];
+            mg_sock_addr_to_str(&c->sa, (char*) addr, sizeof(addr), MG_SOCK_STRINGIFY_IP | MG_SOCK_STRINGIFY_PORT);
+            LOG(LL_INFO, ("%s - closing connection, flags %02X", addr, (int) c->flags));
         };
     }
 }
@@ -236,7 +239,7 @@ static void twinkly_verify_cb(void* data, void* arg) {
         if (code != 1000) {
             LOG(LL_ERROR, ("verify error, code %ld", (long) code));
             // verify error, killing auth_token to re-login and retry
-            mg_strfree(&device->auth_token); 
+            mg_strfree(&device->auth_token);
         }
         twinkly_device_request(device, device->method, device->post_data, device->cb, device->arg);
     }
@@ -340,7 +343,7 @@ static void twinkly_device_cb(void* data, void* arg) {
     LOG(LL_DEBUG, ("%s %p %p", __func__, data, arg));
     struct http_message* hm = data;
     struct async_ctx* device = arg;
-    if(!device)
+    if (!device)
         return;
     if (!data)
         goto exit;
@@ -1097,6 +1100,24 @@ bool mgos_twinkly_set_brightness(int idx, int value) {
     }
     mgos_jstore_free(store);
     return res;
+}
+
+void mgos_twinkly_reset(void) {
+    FILE* fp = NULL;
+    fp = fopen(JSON_PATH, "w");
+    if (fp == NULL) {
+        LOG(LL_ERROR, ("Failed to open '%s' for writing", JSON_PATH));
+        goto clean;
+    }
+
+    fprintf(fp, "{}");
+
+clean:
+    if (fp) {
+        fclose(fp);
+        fp = NULL;
+    }
+    s_devices_number = 0;
 }
 
 // Libarary
